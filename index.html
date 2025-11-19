@@ -11,8 +11,9 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #ffffff; }
         /* Custom Scrollbar for controls */
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
         
         /* Range Slider Styling */
         input[type=range] { -webkit-appearance: none; background: transparent; }
@@ -24,6 +25,7 @@
         input[type=range]::-webkit-slider-runnable-track {
             width: 100%; height: 4px; cursor: pointer; background: #e5e7eb; border-radius: 2px;
         }
+        .cursor-wait { cursor: wait; }
     </style>
 <script type="importmap">
 {
@@ -43,8 +45,8 @@
     <script type="text/babel" data-type="module">
         import React, { useState, useCallback, useRef, useEffect } from 'https://esm.sh/react@18.2.0';
         import ReactDOM from 'https://esm.sh/react-dom@18.2.0/client';
-        import Cropper from 'https://esm.sh/react-easy-crop@5.0.8';
-        import { Upload, Download, RotateCw, ZoomIn, Image as ImageIcon, Check, X, Move, Maximize, AlignCenter, FileText, Smartphone, Monitor } from 'https://esm.sh/lucide-react@0.263.1';
+        import Cropper from 'https://esm.sh/react-easy-crop@5.0.8?deps=react@18.2.0';
+        import { Upload, Download, RotateCw, ZoomIn, Image as ImageIcon, Check, X, Move, Maximize, AlignCenter, FileText, Smartphone } from 'https://esm.sh/lucide-react@0.263.1?deps=react@18.2.0';
 
         // --- CANVAS UTILS ---
         const createImage = (url) =>
@@ -118,19 +120,19 @@
         // --- CONFIGURATION ---
         const ASPECT_RATIOS = [
             { label: '1:1', value: 1, group: 'standard', desc: 'Квадрат' },
-            { label: '3:4', value: 3 / 4, group: 'standard', desc: 'Портрет' },
-            { label: '4:3', value: 4 / 3, group: 'standard', desc: 'Фото' },
             { label: '9:16', value: 9 / 16, group: 'standard', desc: 'Stories' },
-            { label: '16:9', value: 16 / 9, group: 'standard', desc: 'YouTube' },
+            { label: '16:9', value: 16 / 9, group: 'standard', desc: 'Экран' },
+            { label: '3:4', value: 3 / 4, group: 'standard', desc: 'Верт. фото' },
+            { label: '4:3', value: 4 / 3, group: 'standard', desc: 'Фото' },
             { label: '2:3', value: 2 / 3, group: 'standard', desc: '10x15' },
-            { label: '3:2', value: 3 / 2, group: 'standard', desc: 'Пейзаж' },
-            { label: '9:21', value: 9 / 21, group: 'standard', desc: 'Reels/TT' },
+            { label: '3:2', value: 3 / 2, group: 'standard', desc: 'Классика' },
+            { label: '9:21', value: 9 / 21, group: 'standard', desc: 'Верт. кино' },
             { label: '21:9', value: 21 / 9, group: 'standard', desc: 'Кино' },
             
             { label: '3x4 см', value: 3 / 4, group: 'docs', desc: 'Личное дело' },
-            { label: '3.5x4.5', value: 3.5 / 4.5, group: 'docs', desc: 'Паспорт РФ/Загран' },
+            { label: '3.5x4.5', value: 3.5 / 4.5, group: 'docs', desc: 'РФ / Загран' },
             { label: '5x5 см', value: 1, group: 'docs', desc: 'Виза' },
-            { label: 'A4', value: 210 / 297, group: 'docs', desc: 'Документ' },
+            { label: 'A4', value: 210 / 297, group: 'docs', desc: 'Лист' },
         ];
 
         // --- WIDGET COMPONENT ---
@@ -146,7 +148,7 @@
             const [customWidth, setCustomWidth] = useState('');
             const [customHeight, setCustomHeight] = useState('');
             const [unit, setUnit] = useState('px');
-            const [restrictPosition, setRestrictPosition] = useState(false); // Allow borders by default for better UX
+            const [restrictPosition, setRestrictPosition] = useState(false); 
 
             const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
                 setCroppedAreaPixels(croppedAreaPixels);
@@ -161,7 +163,7 @@
                         setZoom(1);
                         setRotation(0);
                         setCrop({ x: 0, y: 0 });
-                        setRestrictPosition(false); // Allow fitting image inside
+                        setRestrictPosition(false); 
                     });
                     reader.readAsDataURL(file);
                 }
@@ -246,7 +248,7 @@
                             onCropComplete={onCropComplete}
                             onZoomChange={setZoom}
                             restrictPosition={restrictPosition}
-                            minZoom={0.1} // Critical for adding borders
+                            minZoom={0.1} 
                             style={{
                                 containerStyle: { background: '#f1f5f9' },
                                 cropAreaStyle: { border: '2px solid rgba(59, 130, 246, 0.8)', boxShadow: '0 0 0 9999em rgba(255, 255, 255, 0.85)' },
@@ -263,7 +265,6 @@
                             </button>
                         </div>
                          
-                         {/* Visual indicator for border mode */}
                         {!restrictPosition && (
                              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white text-[10px] px-2 py-1 rounded backdrop-blur pointer-events-none">
                                  Режим с полями (можно уменьшить фото)
@@ -316,15 +317,15 @@
                                 <div className="flex bg-white rounded shadow-sm p-0.5 border border-slate-200">
                                     <button 
                                         onClick={() => setRestrictPosition(true)}
-                                        className={`px-3 py-1 text-[10px] font-medium rounded transition-colors ${restrictPosition ? 'bg-blue-100 text-blue-700' : 'text-slate-500 hover:text-slate-700'}`}
+                                        className={`flex items-center gap-1 px-3 py-1 text-[10px] font-medium rounded transition-colors ${restrictPosition ? 'bg-blue-100 text-blue-700' : 'text-slate-500 hover:text-slate-700'}`}
                                     >
-                                        Без полей
+                                        <Maximize size={12}/> Без полей
                                     </button>
                                     <button 
                                         onClick={() => setRestrictPosition(false)}
-                                        className={`px-3 py-1 text-[10px] font-medium rounded transition-colors ${!restrictPosition ? 'bg-blue-100 text-blue-700' : 'text-slate-500 hover:text-slate-700'}`}
+                                        className={`flex items-center gap-1 px-3 py-1 text-[10px] font-medium rounded transition-colors ${!restrictPosition ? 'bg-blue-100 text-blue-700' : 'text-slate-500 hover:text-slate-700'}`}
                                     >
-                                        С полями
+                                        <Move size={12}/> С полями
                                     </button>
                                 </div>
                             </div>
@@ -430,6 +431,9 @@
                     <div className="w-full max-w-4xl">
                         <Widget />
                     </div>
+                    <footer className="text-center mt-4 text-slate-400 text-[10px]">
+                        <p>© 2024 PhotoRatio Pro</p>
+                    </footer>
                 </div>
             );
         };
